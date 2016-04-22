@@ -73,6 +73,15 @@ public func Wrap<T>(object: T, dateFormatter: NSDateFormatter? = nil) throws -> 
     return try Wrapper(dateFormatter: dateFormatter).wrap(object, enableCustomizedWrapping: true)
 }
 
+public func WrapArray<T>(objects: [T], dateFormatter: NSDateFormatter? = nil) throws -> [WrappedDictionary] {
+	let mapped = try objects.map { object in
+		return try Wrapper(dateFormatter: dateFormatter).wrap(object, enableCustomizedWrapping: true)
+	}
+	
+	return mapped
+}
+
+
 /**
  *  Alternative `Wrap()` implementation that returns JSON-encoded NSData
  *
@@ -81,6 +90,13 @@ public func Wrap<T>(object: T, dateFormatter: NSDateFormatter? = nil) throws -> 
  */
 public func Wrap<T>(object: T, writingOptions: NSJSONWritingOptions? = nil, dateFormatter: NSDateFormatter? = nil) throws -> NSData {
     return try Wrapper(dateFormatter: dateFormatter).wrap(object, writingOptions: writingOptions ?? [])
+}
+
+public func WrapArray<T>(objects: [T], writingOptions: NSJSONWritingOptions? = nil, dateFormatter: NSDateFormatter? = nil) throws -> [NSData] {
+	let mapped = try objects.map { object in
+		return try Wrapper(dateFormatter: dateFormatter).wrap(object, writingOptions: writingOptions ?? [])
+	}
+	return mapped
 }
 
 /**
