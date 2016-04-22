@@ -92,11 +92,11 @@ public func Wrap<T>(object: T, writingOptions: NSJSONWritingOptions? = nil, date
     return try Wrapper(dateFormatter: dateFormatter).wrap(object, writingOptions: writingOptions ?? [])
 }
 
-public func WrapArray<T>(objects: [T], writingOptions: NSJSONWritingOptions? = nil, dateFormatter: NSDateFormatter? = nil) throws -> [NSData] {
+public func WrapArray<T>(objects: [T], writingOptions: NSJSONWritingOptions? = nil, dateFormatter: NSDateFormatter? = nil) throws -> NSData {
 	let mapped = try objects.map { object in
-		return try Wrapper(dateFormatter: dateFormatter).wrap(object, writingOptions: writingOptions ?? [])
+		return try Wrapper(dateFormatter: dateFormatter).wrap(object, enableCustomizedWrapping:true)
 	}
-	return mapped
+	return try Wrapper(dateFormatter: dateFormatter).wrap(mapped, writingOptions: writingOptions ?? [])
 }
 
 /**
@@ -292,7 +292,14 @@ private extension Wrapper {
         
         return try self.performWrappingForObject(object, usingMirrors: mirrors.reverse())
     }
-    
+
+	func wrap<T>(objects: [T], writingOptions: NSJSONWritingOptions) throws -> NSData {
+		let dictionaryArray = try objects.map { object in
+			return try self.wrap(object, enableCustomizedWrapping: true)
+		}
+		return try NSJSONSerialization.dataWithJSONObject(dictionaryArray, options: writingOptions)
+	}
+
     func wrap<T>(object: T, writingOptions: NSJSONWritingOptions) throws -> NSData {
         let dictionary = try self.wrap(object, enableCustomizedWrapping: true)
         return try NSJSONSerialization.dataWithJSONObject(dictionary, options: writingOptions)
